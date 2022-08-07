@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class UIManager :  Singleton<UIManager>
 {
-
+    
     [SerializeField]
     private HashSet<CanvasController> canvasSets = new HashSet<CanvasController>();
 
@@ -16,7 +16,7 @@ public class UIManager :  Singleton<UIManager>
 
     //call the name of the canvas using StringManager to prevent from mispelled names
     public void ChangeCanvas(string name)
-    {   
+    {
         //looping the hashset for enabling the canvas being called
         foreach(var canvas in canvasSets)
         {

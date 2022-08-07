@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System;
 
 
 // Creating IDs for different ActionMaps
@@ -29,8 +30,16 @@ public class InputManager : Singleton<InputManager>
 {
 
     private PlayerInputs _playerInputs;
-
     private HashSet<ActionMap> _actionMapsHash = new HashSet<ActionMap> ();
+
+    #region -= EVENTS =-
+    public event Action<Vector2> onGroundMovement;
+    public event Action<Vector2> onMouseMovement;
+
+    public event Action onReload;
+    public event Action onMouseShoot;
+
+    #endregion
 
     private void Awake()
     {
@@ -100,11 +109,14 @@ public class InputManager : Singleton<InputManager>
         }
     }
       
-    public void DisableMultipleActionMaps(MapType[] getTypes)
+    public void DisableMultipleActionMaps(HashSet<MapType> getTypes)
     {
-        for (int i = 0; i < getTypes.Length; i++)
+        foreach(var actionMap in _actionMapsHash)
         {
-            DisableActionMap(getTypes[i]);
+            if (getTypes.Contains(actionMap.type))
+            {
+                actionMap.map.Disable();
+            }
         }
     }
 
@@ -125,21 +137,25 @@ public class InputManager : Singleton<InputManager>
         _playerInputs.Movement.GroundMovement.performed += axis =>
         {
             Vector2 inputAxis = axis.ReadValue<Vector2>();
+            onGroundMovement?.Invoke(inputAxis);
         };
 
         _playerInputs.Movement.GroundMovement.canceled += axis =>
         {
             Vector2 inputAxis = axis.ReadValue<Vector2>();
+            onGroundMovement?.Invoke(inputAxis);
         };
 
         _playerInputs.Movement.MouseLook.performed += delta =>
         {
             Vector2 inputAxis = delta.ReadValue<Vector2>();
+            onMouseMovement?.Invoke(inputAxis);
         };
 
         _playerInputs.Movement.MouseLook.canceled += delta =>
         {
             Vector2 inputAxis = delta.ReadValue<Vector2>();
+            onMouseMovement?.Invoke(inputAxis);
         };
     }
 
@@ -165,7 +181,7 @@ public class InputManager : Singleton<InputManager>
 
         };
 
-        _playerInputs.Interaction.PullGrapple.performed += _ =>
+        _playerInputs.Interaction.PullGrapple.canceled += _ =>
         {
 
         };
@@ -176,6 +192,11 @@ public class InputManager : Singleton<InputManager>
         };
 
         _playerInputs.Interaction.Interact.performed += _ =>
+        {
+
+        };
+
+        _playerInputs.Interaction.SlowMotion.performed += _ =>
         {
 
         };
