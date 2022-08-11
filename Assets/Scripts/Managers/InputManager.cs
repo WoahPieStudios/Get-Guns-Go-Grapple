@@ -33,11 +33,11 @@ public class InputManager : Singleton<InputManager>
     private HashSet<ActionMap> _actionMapsHash = new HashSet<ActionMap> ();
 
     #region -= EVENTS =-
-    public event Action<Vector2> onGroundMovement;
-    public event Action<Vector2> onMouseMovement;
+    public static event Action<Vector2> onGroundMovement;
+    public static event Action<Vector2> onMouseMovement;
 
-    public event Action onReload;
-    public event Action onMouseShoot;
+    public static event Action onReload;
+    public static event Action onMouseShoot;
 
     #endregion
 
@@ -45,16 +45,14 @@ public class InputManager : Singleton<InputManager>
     {
         base.Awake();
         _playerInputs = new PlayerInputs(); //Instantiate Player Inputs
-    }
-
-    void Start()
-    {
-
         // add all types of action maps 
         _actionMapsHash.Add(new ActionMap(MapType.Movement, _playerInputs.Movement));
         _actionMapsHash.Add(new ActionMap(MapType.Interaction, _playerInputs.Interaction));
         _actionMapsHash.Add(new ActionMap(MapType.UI, _playerInputs.UI));
+    }
 
+    void Start()
+    {
 
         #region -= METHODS =-
         Movement(); // player movement and mouse look
@@ -89,10 +87,13 @@ public class InputManager : Singleton<InputManager>
         {
             if (getTypes.Contains(actionMap.type))
             {
+                Debug.Log($"actionMap type: {actionMap.type} enabled");
                 actionMap.map.Enable();
+                continue;
             }
             else
             {
+                Debug.Log($"actionMap type: {actionMap.type} disabled");
                 actionMap.map.Disable();
             }
         }
